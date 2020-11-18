@@ -30,7 +30,7 @@ typedef struct
     char email[50];
     char diagnosticDate[50];
     int age;
-    char comorbidities;
+    char comorbidities[50];
 } Ocurrence;
 int is_valid_comorbity(char *value)
 {
@@ -39,7 +39,7 @@ int is_valid_comorbity(char *value)
     if (
         strcmp(strtok(pointer, "\n"), "Diabetes") == 0 ||
         strcmp(strtok(pointer, "\n"), "Obesidade") == 0 ||
-        strcmp(strtok(pointer, "\n"), "Hipertensão") == 0 ||
+        strcmp(strtok(pointer, "\n"), "Hipertensao") == 0 ||
         strcmp(strtok(pointer, "\n"), "Tuberculose") == 0 ||
         strcmp(strtok(pointer, "\n"), "Outros") == 0)
     {
@@ -51,10 +51,11 @@ int is_valid_comorbity(char *value)
     }
 }
 
-int is_valid_age(char *current_date, char *birth_date)
+int is_valid_age(char *current_date, char *birth_date, Ocurrence * data)
 {
     int current_year = atoi(&current_date[strlen(current_date) - 4]);
     int born_year = atoi(&birth_date[strlen(birth_date) - 4]);
+    data->age = current_year - born_year;
     int result = (current_year - born_year > 60 || current_year - born_year < 5) ? 1 : 0;
     return result;
 }
@@ -84,7 +85,7 @@ void get_risk_cases()
     }
     if (risk_cases_counter > 0)
     {
-        printf(ANSI_COLOR_RED "\n Atenção! %d casos de risco encontrados!\n" ANSI_COLOR_RESET, risk_cases_counter);
+        printf(ANSI_COLOR_RED "\n Atencao! %d casos de risco encontrados!\n" ANSI_COLOR_RESET, risk_cases_counter);
     }
 }
 
@@ -106,8 +107,8 @@ void show_login()
     char line[PATH_MAX];
     int line_counter = 0;
 
-    printf(ANSI_COLOR_RED "Login" ANSI_COLOR_RESET "\n");
-    printf("Nome do usuário: ");
+    printf("Login\n");
+    printf("Nome do usuario: ");
     fgets(username, sizeof(username), stdin);
     printf("Senha: ");
     fgets(password, sizeof(password), stdin);
@@ -166,19 +167,19 @@ void show_login()
     }
     else
     {
-        printf("Erro! O arquivo Users.csv não foi encontrado\n");
+        printf("Erro! O arquivo Users.csv nao foi encontrado\n");
         exit(1);
     }
     fclose(users_list);
     if (username_match == 1 && password_match == 1)
     {
-        printf("Usuário autenticado\n");
+        printf("Usuario autenticado\n");
         is_authorized = 1;
         pause_system();
     }
     else
     {
-        printf("Usuário não autorizado!\n");
+        printf("Usuario nao autorizado!\n");
         pause_system();
         exit(1);
     }
@@ -197,7 +198,7 @@ void insert_new_record()
     fgets(&new_record.document, sizeof(new_record.document), stdin);
     printf("Telefone: ");
     fgets(&new_record.phone, sizeof(new_record.phone), stdin);
-    printf("Endereço (Não inserir vírgulas): ");
+    printf("Endereço (Nao inserir virgulas): ");
     fgets(&new_record.address, sizeof(new_record.address), stdin);
     printf("CEP: ");
     fgets(&new_record.cep, sizeof(new_record.cep), stdin);
@@ -205,9 +206,9 @@ void insert_new_record()
     fgets(&new_record.birthdate, sizeof(new_record.birthdate), stdin);
     printf("E-mail: ");
     fgets(&new_record.email, sizeof(new_record.email), stdin);
-    printf("Data de Diagnóstico (dd/mm/yyyy): ");
+    printf("Data de Diagnostico (dd/mm/yyyy): ");
     fgets(&new_record.diagnosticDate, sizeof(new_record.diagnosticDate), stdin);
-    printf("Comorbidade (1- Diabetes, 2 - Obesidade, 3 - Hipertensão, 4 - Tuberculose, 5 - Outros, 6 - Nenhuma): ");
+    printf("Comorbidade (1- Diabetes, 2 - Obesidade, 3 - Hipertensao, 4 - Tuberculose, 5 - Outros, 6 - Nenhuma): ");
     fgets(&comorbity_option, sizeof(comorbity_option), stdin);
     switch (comorbity_option[0])
     {
@@ -218,7 +219,7 @@ void insert_new_record()
         strcpy(new_record.comorbidities, "Obesidade");
         break;
     case '3':
-        strcpy(new_record.comorbidities, "Hipertensão");
+        strcpy(new_record.comorbidities, "Hipertensao");
         break;
     case '4':
         strcpy(new_record.comorbidities, "Tuberculose");
@@ -231,26 +232,28 @@ void insert_new_record()
         break;
     }
 
-    strcpy(new_record.name, strtok(new_record.name, "\n"));
-    strcpy(new_record.cep, strtok(new_record.cep, "\n"));
-    strcpy(new_record.address, strtok(new_record.address, "\n"));
-    strcpy(new_record.phone, strtok(new_record.phone, "\n"));
-    strcpy(new_record.birthdate, strtok(new_record.birthdate, "\n"));
-    strcpy(new_record.diagnosticDate, strtok(new_record.diagnosticDate, "\n"));
-    strcpy(new_record.document, strtok(new_record.document, "\n"));
-    strcpy(new_record.email, strtok(new_record.email, "\n"));
-
-    int is_risk_case = (is_valid_age(new_record.diagnosticDate, new_record.birthdate) == 1 && is_valid_comorbity(new_record.comorbidities) == 1) ? 1 : 0;
+    new_record.name[strcspn(new_record.name, "\n")] = '\0';
+    new_record.address[strcspn(new_record.address, "\n")] = '\0';
+    new_record.phone[strcspn(new_record.phone, "\n")] = '\0';
+    new_record.birthdate[strcspn(new_record.birthdate, "\n")] = '\0';
+    new_record.diagnosticDate[strcspn(new_record.diagnosticDate, "\n")] = '\0';
+    new_record.document[strcspn(new_record.document, "\n")] = '\0';
+    new_record.email[strcspn(new_record.email, "\n")] = '\0';
+    int is_risk_case = (is_valid_age(new_record.diagnosticDate, new_record.birthdate, &new_record) == 1 || is_valid_comorbity(new_record.comorbidities) == 1) ? 1 : 0;
     getcwd(cwd, sizeof(cwd));
-
     if (is_risk_case == 1)
     {
+        int int_age = new_record.age;
+        char str_age[4];
+        sprintf(str_age, "%d", int_age);
         strcat(cwd, "/data/RiskCases.csv");
-        FILE *ocurrences_file = fopen(cwd, "a");
-        fprintf(ocurrences_file, "\n%s,%s,%d", new_record.name, new_record.cep, new_record.age);
-        fclose(ocurrences_file);
+        FILE *risk_cases_file = fopen(cwd, "a");
+        char str_risk_line[200];
+
+        fprintf(risk_cases_file, "\n%s", str_risk_line);
+        fclose(risk_cases_file);
         printf(ANSI_COLOR_GREEN "Novo Registro inserido com sucesso!" ANSI_COLOR_RESET);
-        printf(ANSI_COLOR_RED "Atenção! Este paciente pertence aos grupos de risco!" ANSI_COLOR_RESET);
+        printf(ANSI_COLOR_RED "Atencao! Este paciente pertence aos grupos de risco!" ANSI_COLOR_RESET);
     }
     else
     {
@@ -259,7 +262,7 @@ void insert_new_record()
         fprintf(ocurrences_file, "\n%s,%s,%s,%s,%s,%s,%s,%s", new_record.name, new_record.phone, new_record.document, new_record.address, new_record.birthdate, new_record.email, new_record.diagnosticDate, new_record.comorbidities);
         fclose(ocurrences_file);
         printf(ANSI_COLOR_GREEN "Novo Registro inserido com sucesso!" ANSI_COLOR_RESET);
-        printf(ANSI_COLOR_YELLOW "Este usuário não pertence aos grupos de risco!" ANSI_COLOR_RESET);
+        printf(ANSI_COLOR_YELLOW "Este paciente nao pertence aos grupos de risco!" ANSI_COLOR_RESET);
     }
     pause_system();
     show_menu();
@@ -336,6 +339,7 @@ void get_all_risk_cases()
             line_counter++;
         }
     }
+    printf("\n");
     pause_system();
     show_menu();
 }
@@ -346,7 +350,7 @@ void get_header()
 
     for (int vertical_line_counter = 0; vertical_line_counter < 30; vertical_line_counter++)
     {
-        printf(ANSI_COLOR_BLUE "\u2500");
+        printf(ANSI_COLOR_BLUE "__");
     }
     printf(ANSI_COLOR_RESET, "\n");
 }
@@ -390,7 +394,7 @@ void get_all_records()
     }
     if (line_counter <= 1)
     {
-        printf(ANSI_COLOR_CYAN "Nenhum registro encontrado!", ANSI_COLOR_RESET);
+        printf(ANSI_COLOR_CYAN "Nenhum registro encontrado!\n", ANSI_COLOR_RESET);
     }
     pause_system();
     show_menu();
@@ -399,7 +403,7 @@ void get_all_records()
 void show_confirmation_exit()
 {
     char repile[1];
-    printf("\nConfirmação:\n");
+    printf("\nConfirmacao:\n");
     printf("Tem certeza que deseja sair? (s/n): ");
     scanf(" %c", &repile);
     if (repile[0] == 'n')
@@ -420,12 +424,12 @@ void show_menu()
     verify_if_is_authorized();
     get_header();
     get_risk_cases();
-    printf(ANSI_COLOR_YELLOW "\nOpções:" ANSI_COLOR_RESET "\n\n");
+    printf(ANSI_COLOR_YELLOW "\nOpcoes:" ANSI_COLOR_RESET "\n\n");
     printf(ANSI_COLOR_YELLOW "  1 - Ver todos os registros" ANSI_COLOR_RESET "\n");
     printf(ANSI_COLOR_YELLOW "  2 - Ver todos os casos de risco" ANSI_COLOR_RESET "\n");
     printf(ANSI_COLOR_YELLOW "  3 - Inserir novo caso" ANSI_COLOR_RESET "\n");
     printf(ANSI_COLOR_YELLOW "  0 - Sair" ANSI_COLOR_RESET "\n");
-    printf("\n\nSelecione o número de uma opção do menu: ");
+    printf("\n\nSelecione o número de uma opcao do menu: ");
     fgets(selected_option, sizeof(selected_option), stdin);
     switch (selected_option[0])
     {
@@ -442,8 +446,8 @@ void show_menu()
         insert_new_record();
         break;
     default:
-        printf("Opção inválida!");
-        pause();
+        printf("Opcao inválida!");
+        pause_system();
         show_menu();
         break;
     }
@@ -451,7 +455,7 @@ void show_menu()
 
 int main()
 {
-    setlocale(LC_ALL, "Portuguese");
+    setlocale(LC_ALL, "");
     show_login();
     show_menu();
     return 0;
