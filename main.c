@@ -85,7 +85,7 @@ void get_risk_cases()
     }
     if (risk_cases_counter > 0)
     {
-        printf(ANSI_COLOR_RED "\n Atencao! %d casos de risco encontrados!\n" ANSI_COLOR_RESET, risk_cases_counter);
+        printf(ANSI_COLOR_RED "\n Atencao! %d casos de risco encontrados!\n" ANSI_COLOR_RESET, risk_cases_counter / 2);
     }
 }
 
@@ -198,7 +198,7 @@ void insert_new_record()
     fgets(&new_record.document, sizeof(new_record.document), stdin);
     printf("Telefone: ");
     fgets(&new_record.phone, sizeof(new_record.phone), stdin);
-    printf("Endereço (Nao inserir virgulas): ");
+    printf("Endereco (Nao inserir virgulas): ");
     fgets(&new_record.address, sizeof(new_record.address), stdin);
     printf("CEP: ");
     fgets(&new_record.cep, sizeof(new_record.cep), stdin);
@@ -244,16 +244,16 @@ void insert_new_record()
     if (is_risk_case == 1)
     {
         int int_age = new_record.age;
-        char str_age[4];
+        char str_age[3];
         sprintf(str_age, "%d", int_age);
         strcat(cwd, "/data/RiskCases.csv");
         FILE *risk_cases_file = fopen(cwd, "a");
-        char str_risk_line[200];
-
-        fprintf(risk_cases_file, "\n%s", str_risk_line);
+        fprintf(risk_cases_file, "\n%s", new_record.name);
+        fprintf(risk_cases_file, ",%s", new_record.cep);
+        fprintf(risk_cases_file, ",%s", str_age);
         fclose(risk_cases_file);
-        printf(ANSI_COLOR_GREEN "Novo Registro inserido com sucesso!" ANSI_COLOR_RESET);
-        printf(ANSI_COLOR_RED "Atencao! Este paciente pertence aos grupos de risco!" ANSI_COLOR_RESET);
+        printf(ANSI_COLOR_GREEN "Novo Registro inserido com sucesso!\n" ANSI_COLOR_RESET);
+        printf(ANSI_COLOR_RED "Atencao! Este paciente pertence aos grupos de risco!\n" ANSI_COLOR_RESET);
     }
     else
     {
@@ -394,8 +394,9 @@ void get_all_records()
     }
     if (line_counter <= 1)
     {
-        printf(ANSI_COLOR_CYAN "Nenhum registro encontrado!\n", ANSI_COLOR_RESET);
+        printf(ANSI_COLOR_CYAN "\nNenhum registro encontrado!\n", ANSI_COLOR_RESET);
     }
+    printf("\n");
     pause_system();
     show_menu();
 }
@@ -413,7 +414,7 @@ void show_confirmation_exit()
     else
     {
         clear();
-        printf("\nAté logo!\n");
+        printf("\nAte logo!\n");
         exit(1);
     }
 }
@@ -429,7 +430,7 @@ void show_menu()
     printf(ANSI_COLOR_YELLOW "  2 - Ver todos os casos de risco" ANSI_COLOR_RESET "\n");
     printf(ANSI_COLOR_YELLOW "  3 - Inserir novo caso" ANSI_COLOR_RESET "\n");
     printf(ANSI_COLOR_YELLOW "  0 - Sair" ANSI_COLOR_RESET "\n");
-    printf("\n\nSelecione o número de uma opcao do menu: ");
+    printf("\n\nSelecione o numero de uma opcao do menu: ");
     fgets(selected_option, sizeof(selected_option), stdin);
     switch (selected_option[0])
     {

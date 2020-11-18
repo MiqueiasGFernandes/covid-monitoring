@@ -7,3 +7,11 @@
 	<string.h>
 	<locale.h>
 
+1605738026 source:z:\fmmc\main.c
+	<stdlib.h>
+	<stdio.h>
+	<unistd.h>
+	<limits.h>
+	<string.h>
+	<locale.h>
+

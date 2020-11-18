@@ -33,6 +33,9 @@
 		</Compiler>
 		<Unit filename="covid-monitoring-tool.cbp" />
 		<Unit filename="covid-monitoring-tool.layout" />
+		<Unit filename="data/Ocurrences.csv" />
+		<Unit filename="data/RiskCases.csv" />
+		<Unit filename="data/Users.csv" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
